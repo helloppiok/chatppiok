@@ -1,0 +1,5 @@
+services:
+  # 여기는 infra/docker/* 이미지 구성에 맞춰 채우시면 됩니다.
+  placeholder:
+    image: alpine:3
+    command: ["sh","-c","echo chatppiok"]
