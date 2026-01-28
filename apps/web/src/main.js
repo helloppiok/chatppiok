@@ -4,10 +4,29 @@ import { moveMe } from "./components/canvas/movement.js";
 import { render } from "./components/canvas/render.js";
 import { addMsg } from "./components/chat/chat.js";
 
+function updateStageScale(){
+  const root = document.documentElement;
+
+  const stageW = 1280;
+  const stageH = 720;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const safeW = Math.max(0, vw - 16);
+  const safeH = Math.max(0, vh - 16);
+
+  const scale = Math.min(safeW / stageW, safeH / stageH);
+
+  root.style.setProperty("--stage-scale", String(Math.max(0, +scale.toFixed(4))));
+}
+
 function init(){
+  updateStageScale();
+  window.addEventListener("resize", updateStageScale);
+
   document.body.focus();
 
-  // DOM
   const meNameEl = document.getElementById("cs-me-name");
   const meDotEl = document.getElementById("cs-me-dot");
   const toastEl = document.getElementById("cs-toast");
@@ -16,7 +35,6 @@ function init(){
   const chatForm = document.getElementById("cs-chat-form");
   const chatInput = document.getElementById("cs-chat-input");
 
-  // 내 캐릭터 초기값
   const namePoolA = ["몽글","푸른","은은","조용","반짝","새벽","아늑","달콤","차분","맑은","검은","하얀"];
   const namePoolB = ["고래","고양이","여우","펭귄","토끼","판다","호랑이","수달","참새","돌고래","곰","강아지"];
   const nickname = `${namePoolA[rand(0,namePoolA.length-1)]}${namePoolB[rand(0,namePoolB.length-1)]}${rand(1000,9999)}`;
@@ -29,11 +47,9 @@ function init(){
   meNameEl.textContent = nickname;
   meDotEl.style.background = myColor;
 
-  // canvas 초기화
   initCanvas();
   resize();
 
-  // 토스트
   function toast(msg){
     toastEl.textContent = msg;
     toastEl.classList.add("show");
@@ -41,7 +57,6 @@ function init(){
     toastEl._t = window.setTimeout(() => toastEl.classList.remove("show"), 1100);
   }
 
-  // 좌표 변환
   function getCanvasPoint(e){
     const rect = canvas.getBoundingClientRect();
     const s = state.viewScale || 1;
@@ -55,7 +70,6 @@ function init(){
     };
   }
 
-  // 입력 바인딩
   function bindInputs(){
     document.addEventListener("keydown", (e) => {
       const isArrow =
@@ -112,7 +126,9 @@ function init(){
 
   bindInputs();
 
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", () => {
+    resize();
+  });
 
   function loop(){
     moveMe();
